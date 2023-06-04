@@ -7,9 +7,17 @@ const cors = require('cors');
 const rootRouter = require('./routes/root.routes');
 
 dotenv.config();
+console.log({
+  mongodb: process.env.MONGODB_URI,
+  redis: process.env.REDIS_HOST,
+  redisPort: process.env.REDIS_PORT,
+  jwt_secret: process.env.JWT_SECRET,
+  refresh_secret: process.env.REFRESH_SECRET,
+})
 
 const app = express();
 app.use(cors());
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
 

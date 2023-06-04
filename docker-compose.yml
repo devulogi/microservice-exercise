@@ -2,12 +2,14 @@ version: '3.8'
 services:
   app:
     build:
-      context: .
+      context: ./auth-service
       dockerfile: Dockerfile
+    container_name: auth-service
     ports:
-      - 3000:3000
+      - 3001:3001
     depends_on:
       - mongo
+      - redis
     environment:
       - MONGO_URI=mongodb://mongo:27017/cms
       - REDIS_HOST=redis
@@ -15,22 +17,26 @@ services:
       - JWT_SECRET=462D4A614E645267556A586E3272357538782F413F4428472B4B625065536856
       - REFRESH_SECRET=6150645367556B58703273357638792F423F4528482B4D6251655468576D5971
     volumes:
-      - .:/app
+      - ./auth-service:/app
       - /app/node_modules
-    links:
-      - mongo
+    networks:
+      - microservices_network
   mongo:
     image: mongo:latest
     ports:
       - 27017:27017
     volumes:
       - mongo_data:/data/db
+    networks:
+      - microservices_network
   redis:
     image: redis:latest
     ports:
       - 6379:6379
     volumes:
       - redis_data:/data
+    networks:
+      - microservices_network
   mongo-express:
     image: mongo-express:latest
     ports:
@@ -40,6 +46,11 @@ services:
       - ME_CONFIG_MONGODB_PORT=27017
     depends_on:
       - mongo
+    networks:
+      - microservices_network
 volumes:
   mongo_data:
   redis_data:
+networks:
+  microservices_network:
+    driver: bridge
